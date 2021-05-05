@@ -1,4 +1,3 @@
-
 //----------------------------------------IMPORTS-----------------------------------------------
 const server = require('http').createServer()
 const io = require('socket.io')(server)
@@ -54,7 +53,39 @@ if(socketIDOFUser == undefined){
 return socketIDOFUser.socket_client_id;
 }
 
+function checkOnlineHandler(client,receiver_user_online_status){
+    let receiver_user_id= receiver_user_online_status.ReceiverID;
 
+    printClass.printUserCheckOnline(receiver_user_id);
+
+    let receiver_user_socket_id= getSocketIDFomMap(receiver_user_id);
+    let isOnline = undefined != receiver_user_socket_id;
+    console.log(isOnline);
+    receiver_user_online_status.to_user_online_status= isOnline
+    sendOnlineStatusBack(client,SUB_EVENT_IS_USER_CONNECTED, receiver_user_online_status);      
+}
+
+function sendOnlineStatusBack (client,event,chat_message){
+  console.log(chat_message);
+  client.emit(event,JSON.stringify(chat_message) );
+}
+
+
+function removeUserFromUserMap(socket_client_id){
+  let deleteUser;
+  for(let key of usersMap){
+    let userMapValue = key[1];
+    if(userMapValue.socket_client_id==socket_client_id ){
+      deleteUser= key[0];
+    }
+
+  }
+if(undefined!= deleteUser){
+ usersMap.delete(deleteUser);
+ printClass.printdeleteUserFromMap(deleteUser);
+ console.log(usersMap);
+}
+}
 //----------------------------------------SOCKET SERVER-----------------------------------------------
 io.on(ON_CONNECTION, function (client) {
   printClass.onConnectionPrint(client);
@@ -62,12 +93,17 @@ io.on(ON_CONNECTION, function (client) {
   let valueForUserMap= {socket_client_id:client.id};
   addUserToUsersMap(from_user_id,valueForUserMap);
   printClass.printOnlineUsersNumber(usersMap);
-
   
+ client.on(EVENT_IS_USER_ONLINE, function (to_user_online_status){
+  console.log(to_user_online_status);
+
+     checkOnlineHandler(client,to_user_online_status);
+ });
+
   client.on(EVENT_SINGLE_CHAT_MESSAGE, function (chat_message){
      singleChatHandler(client,chat_message)
      
-    })
+    })  
 
   client.on('typing', function name(data) {
     console.log(data);
@@ -89,6 +125,10 @@ io.on(ON_CONNECTION, function (client) {
 
   client.on(ON_DISCONNECTION, function () {
     printClass.onDisconnectionPrint(client);
+    removeUserFromUserMap(client.id);
+
+    client.removeAllListeners(SUB_EVENT_RECEIVE_MESSAGE); 
+    client.removeAllListeners(SUB_EVENT_IS_USER_CONNECTED); 
     client.removeAllListeners(ON_DISCONNECTION); 
   })
 

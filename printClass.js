@@ -28,4 +28,14 @@ module.exports = class PrintClass
         console.log('-------------------------------------------------------------------------------------------------');
         console.log("Chat User Not Connected");
     }
+
+    printUserCheckOnline(receiver_user_id){
+        console.log('-------------------------------------------------------------------------------------------------');
+        console.log("Checking Online User => " + receiver_user_id);
+    }
+
+    printdeleteUserFromMap(socket_client_id){
+        console.log('-------------------------------------------------------------------------------------------------');
+        console.log("User Deleted From Map => " + socket_client_id);
+    }
 }   
