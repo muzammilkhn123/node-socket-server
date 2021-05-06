@@ -38,4 +38,9 @@ module.exports = class PrintClass
         console.log('-------------------------------------------------------------------------------------------------');
         console.log("User Deleted From Map => " + socket_client_id);
     }
+
+    printIsTypingReceived(typingModel){
+        console.log('-------------------------------------------------------------------------------------------------');
+        console.log(typingModel);
+    }
 }   

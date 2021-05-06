@@ -17,6 +17,9 @@ let EVENT_SINGLE_CHAT_MESSAGE= "single_chat_message";
 // Sub Events
 let SUB_EVENT_RECEIVE_MESSAGE= "receive_message";
 let SUB_EVENT_IS_USER_CONNECTED= "is_user_connected";
+let SUB_EVENT_SEND_TYPING= "send_typing";
+let SUB_EVENT_RECEIVED_TYPING= "received_typing";
+
 
   const usersMap= new Map();
  
@@ -43,6 +46,19 @@ function singleChatHandler(client,chat_message){
 function sendMessageToReceiver(client,receiverSocketID,event,chat_message){
   client.to(receiverSocketID).emit(event,JSON.stringify(chat_message) );
 } 
+
+function typingHandler(client,data){
+  let receiverSocketID= getSocketIDFomMap(data.receiverID);
+  if(receiverSocketID== undefined){
+    printClass.printUserNotConnected()
+  return
+  }
+  sendTypingToReceiver(client,receiverSocketID,SUB_EVENT_RECEIVED_TYPING,data);
+
+}
+function sendTypingToReceiver(client,receiverSocketID,event,data){
+client.to(receiverSocketID).emit(event,JSON.stringify(data));
+}
 
 
 function getSocketIDFomMap(userID){
@@ -105,8 +121,9 @@ io.on(ON_CONNECTION, function (client) {
      
     })  
 
-  client.on('typing', function name(data) {
-    console.log(data);
+  client.on(SUB_EVENT_SEND_TYPING, function name(data) {
+    printClass.printIsTypingReceived(data)
+    typingHandler(client,data)
     io.emit('typing', data)
   })
 
