@@ -44,11 +44,12 @@ function singleChatHandler(client,chat_message){
 
 
 function sendMessageToReceiver(client,receiverSocketID,event,chat_message){
-  client.to(receiverSocketID).emit(event,JSON.stringify(chat_message) );
+  client.to(receiverSocketID).emit(event,JSON.stringify(chat_message) );  
 } 
 
 function typingHandler(client,data){
   let receiverSocketID= getSocketIDFomMap(data.receiverID);
+  console.log(receiverSocketID);
   if(receiverSocketID== undefined){
     printClass.printUserNotConnected()
   return
