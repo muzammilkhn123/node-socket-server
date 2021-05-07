@@ -20,8 +20,7 @@ let SUB_EVENT_IS_USER_CONNECTED= "is_user_connected";
 let SUB_EVENT_SEND_TYPING= "send_typing";
 let SUB_EVENT_RECEIVED_TYPING= "received_typing";
 
-
-  const usersMap= new Map();
+const usersMap= new Map();
  
 //----------------------------------------HELPER FUNCTION FOR SOCKET-----------------------------------------------
 function addUserToUsersMap(key_user_id,valueForUserMap){
@@ -125,7 +124,7 @@ io.on(ON_CONNECTION, function (client) {
   client.on(SUB_EVENT_SEND_TYPING, function name(data) {
     printClass.printIsTypingReceived(data)
     typingHandler(client,data)
-    io.emit('typing', data)
+    io.emit(SUB_EVENT_SEND_TYPING, data)
   })
 
   client.on(SUB_EVENT_RECEIVE_MESSAGE, function name(data) {
@@ -138,8 +137,7 @@ io.on(ON_CONNECTION, function (client) {
     io.emit('location', data);
   }) 
 
-  client.on('connect', function () {
-  })
+
 
   client.on(ON_DISCONNECTION, function () {
     printClass.onDisconnectionPrint(client);
